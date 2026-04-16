@@ -13,7 +13,7 @@ const usePermissions = (
       const member = workspace.members.find((m) => {
         const memberUserId =
           m.userId && typeof m.userId === "object"
-            ? m.userId._id
+            ? (m.userId as any)._id
             : m.userId;
         return String(memberUserId) === String(user._id);
       });
