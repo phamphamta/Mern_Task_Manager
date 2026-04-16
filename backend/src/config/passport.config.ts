@@ -62,5 +62,17 @@ passport.use(
   )
 );
 
-passport.serializeUser((user: any, done) => done(null, user));
-passport.deserializeUser((user: any, done) => done(null, user));
+import UserModel from "../models/user.model";
+
+passport.serializeUser((user: any, done) => {
+  done(null, user._id);
+});
+
+passport.deserializeUser(async (id: any, done) => {
+  try {
+    const user = await UserModel.findById(id).populate("currentWorkspace");
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});

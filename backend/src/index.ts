@@ -46,6 +46,7 @@ app.use(
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Force session cookie to be set on every response
     proxy: true, // Required for secure cookies behind a proxy
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
