@@ -84,7 +84,7 @@ export const getWorkspaceByIdService = async (workspaceId: string) => {
     workspaceId,
   })
     .populate("userId", "name email profilePicture")
-    .populate("role", "name");
+    .populate("role", "name permissions");
 
   const workspaceWithMembers = {
     ...workspace.toObject(),
@@ -107,7 +107,7 @@ export const getWorkspaceMembersService = async (workspaceId: string) => {
     workspaceId,
   })
     .populate("userId", "name email profilePicture -password")
-    .populate("role", "name");
+    .populate("role", "name permissions");
 
   const roles = await RoleModel.find({}, { name: 1, _id: 1 })
     .select("-permission")
