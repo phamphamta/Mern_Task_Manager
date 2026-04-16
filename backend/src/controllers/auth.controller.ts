@@ -24,11 +24,13 @@ export const googleLoginCallback = asyncHandler(
 
 export const registerUserController = asyncHandler(
   async (req: Request, res: Response) => {
+    console.log("Auth Controller: Starting registration for", req.body.email);
     const body = registerSchema.parse({
       ...req.body,
     });
 
     await registerUserService(body);
+    console.log("Auth Controller: Registration successful.");
 
     return res.status(HTTPSTATUS.CREATED).json({
       message: "User created successfully",
@@ -38,6 +40,7 @@ export const registerUserController = asyncHandler(
 
 export const loginController = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log("Auth Controller: Starting login for", req.body.email);
     passport.authenticate(
       "local",
       (
@@ -46,10 +49,12 @@ export const loginController = asyncHandler(
         info: { message: string } | undefined
       ) => {
         if (err) {
+          console.error("Auth Controller Error: Passport auth error:", err);
           return next(err);
         }
 
         if (!user) {
+          console.warn("Auth Controller: Login failed - Invalid credentials.");
           return res.status(HTTPSTATUS.UNAUTHORIZED).json({
             message: info?.message || "Invalid email or password",
           });
@@ -57,9 +62,11 @@ export const loginController = asyncHandler(
 
         req.logIn(user, (err) => {
           if (err) {
+            console.error("Auth Controller Error: req.logIn error:", err);
             return next(err);
           }
 
+          console.log("Auth Controller: Login successful for", user);
           return res.status(HTTPSTATUS.OK).json({
             message: "Logged in successfully",
             user,
