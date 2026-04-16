@@ -11,14 +11,14 @@ export const googleLoginCallback = asyncHandler(
     const currentWorkspace = req.user?.currentWorkspace;
 
     if (!currentWorkspace) {
-      return res.redirect(
-        `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`
-      );
+      return req.session.save(() => {
+        res.redirect(`${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`);
+      });
     }
 
-    return res.redirect(
-      `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`
-    );
+    return req.session.save(() => {
+      res.redirect(`${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`);
+    });
   }
 );
 
