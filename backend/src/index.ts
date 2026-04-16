@@ -1,7 +1,8 @@
 import "dotenv/config";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import session from "cookie-session";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import { config } from "./config/app.config";
 import connectDatabase from "./config/database.config";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
@@ -38,30 +39,21 @@ app.set("trust proxy", 1);
 
 app.use(
   session({
+    store: MongoStore.create({
+      mongoUrl: config.MONGO_URI,
+    }),
     name: "session",
-    keys: [config.SESSION_SECRET],
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: true, // Always true for cross-site cookies
-    httpOnly: true,
-    sameSite: "none",
-    partitioned: true, // Support for CHIPS (Chrome's new standard)
+    secret: config.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    },
   })
 );
-
-// Fix for Passport v0.6.0+ incompatibility with cookie-session
-app.use((req, res, next) => {
-  if (req.session && !req.session.regenerate) {
-    req.session.regenerate = (cb: any) => {
-      cb();
-    };
-  }
-  if (req.session && !req.session.save) {
-    req.session.save = (cb: any) => {
-      cb();
-    };
-  }
-  next();
-});
 
 app.use(passport.initialize());
 app.use(passport.session());
