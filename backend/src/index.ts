@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: [config.FRONTEND_ORIGIN, `${config.FRONTEND_ORIGIN}/`],
+    origin: config.FRONTEND_ORIGIN,
     credentials: true,
   })
 );
@@ -46,11 +46,13 @@ app.use(
     secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    proxy: true, // Required for secure cookies behind a proxy
     cookie: {
       maxAge: 24 * 60 * 60 * 1000,
       secure: true,
       httpOnly: true,
       sameSite: "none",
+      partitioned: true, // Partitioned cookie for cross-site
     },
   })
 );
