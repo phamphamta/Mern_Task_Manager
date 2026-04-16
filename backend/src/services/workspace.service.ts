@@ -82,7 +82,9 @@ export const getWorkspaceByIdService = async (workspaceId: string) => {
 
   const members = await MemberModel.find({
     workspaceId,
-  }).populate("role");
+  })
+    .populate("userId", "name email profilePicture")
+    .populate("role", "name");
 
   const workspaceWithMembers = {
     ...workspace.toObject(),
