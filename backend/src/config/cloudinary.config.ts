@@ -1,6 +1,8 @@
+import { Request } from "express";
 import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const CloudinaryStorage = require("multer-storage-cloudinary");
 import { config } from "./app.config";
 
 cloudinary.config({
@@ -9,9 +11,9 @@ cloudinary.config({
   api_secret: config.CLOUDINARY_API_SECRET,
 });
 
-const storage = new CloudinaryStorage({
+const storage = CloudinaryStorage({
   cloudinary: cloudinary,
-  params: async (req, file) => {
+  params: async (req: Request, file: Express.Multer.File) => {
     // Determine resource_type based on mimetype
     // Cloudinary uses "image", "video", or "raw" (for documents/zips)
     let resource_type = "auto";
