@@ -15,11 +15,16 @@ const usePermissions = (
           m.userId && typeof m.userId === "object"
             ? m.userId._id
             : m.userId;
-        return String(memberUserId) === String(user?._id);
+        return String(memberUserId) === String(user._id);
       });
+
       if (member) {
         setPermissions(member.role.permissions || []);
+      } else {
+        setPermissions([]);
       }
+    } else {
+      setPermissions([]);
     }
   }, [user, workspace]);
 
