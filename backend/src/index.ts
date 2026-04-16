@@ -45,6 +45,21 @@ app.use(
   })
 );
 
+// Fix for Passport v0.6.0+ incompatibility with cookie-session
+app.use((req, res, next) => {
+  if (req.session && !req.session.regenerate) {
+    req.session.regenerate = (cb: any) => {
+      cb();
+    };
+  }
+  if (req.session && !req.session.save) {
+    req.session.save = (cb: any) => {
+      cb();
+    };
+  }
+  next();
+});
+
 app.use(passport.initialize());
 app.use(passport.session());
 
