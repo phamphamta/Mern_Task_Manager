@@ -12,12 +12,20 @@ export const googleLoginCallback = asyncHandler(
 
     if (!currentWorkspace) {
       return req.session.save(() => {
-        res.redirect(`${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure`);
+        res.send(`
+          <script>
+            window.location.href = "${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=failure";
+          </script>
+        `);
       });
     }
 
     return req.session.save(() => {
-      res.redirect(`${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`);
+      res.send(`
+        <script>
+          window.location.href = "${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}";
+        </script>
+      `);
     });
   }
 );
