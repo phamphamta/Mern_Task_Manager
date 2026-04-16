@@ -12,8 +12,10 @@ const usePermissions = (
     if (user && workspace) {
       const member = workspace.members.find((m) => {
         const memberUserId =
-          typeof m.userId === "object" ? m.userId._id : m.userId;
-        return String(memberUserId) === String(user._id);
+          m.userId && typeof m.userId === "object"
+            ? m.userId._id
+            : m.userId;
+        return String(memberUserId) === String(user?._id);
       });
       if (member) {
         setPermissions(member.role.permissions || []);
