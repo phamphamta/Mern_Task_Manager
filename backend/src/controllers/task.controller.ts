@@ -194,7 +194,7 @@ export const deleteTaskAttachmentController = asyncHandler(
       workspaceId,
       projectId,
       taskId,
-      publicId
+      publicId as string
     );
 
     return res.status(HTTPSTATUS.OK).json({
