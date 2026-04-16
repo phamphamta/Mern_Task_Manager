@@ -25,18 +25,19 @@ export const loginOrCreateAccountService = async (data: {
 
   try {
     session.startTransaction();
-    console.log("Started Session...");
+    console.log("Auth Service: Starting Transaction...");
 
     let user = await UserModel.findOne({ email }).session(session);
 
     if (!user) {
-      // Create a new user if it doesn't exist
+      console.log("Auth Service: User not found, creating new user...");
       user = new UserModel({
         email,
         name: displayName,
         profilePicture: picture || null,
       });
       await user.save({ session });
+      console.log("Auth Service: User saved.");
 
       const account = new AccountModel({
         userId: user._id,
@@ -44,20 +45,22 @@ export const loginOrCreateAccountService = async (data: {
         providerId: providerId,
       });
       await account.save({ session });
+      console.log("Auth Service: Account saved.");
 
-      // 3. Create a new workspace for the new user
       const workspace = new WorkspaceModel({
         name: `My Workspace`,
         description: `Workspace created for ${user.name}`,
         owner: user._id,
       });
       await workspace.save({ session });
+      console.log("Auth Service: Workspace saved.");
 
       const ownerRole = await RoleModel.findOne({
         name: Roles.OWNER,
       }).session(session);
 
       if (!ownerRole) {
+        console.error("Auth Service Error: OWNER role not found in DB!");
         throw new NotFoundException("Owner role not found");
       }
 
@@ -68,16 +71,19 @@ export const loginOrCreateAccountService = async (data: {
         joinedAt: new Date(),
       });
       await member.save({ session });
+      console.log("Auth Service: Member saved.");
 
       user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
       await user.save({ session });
+      console.log("Auth Service: User updated with workspace.");
     }
     await session.commitTransaction();
     session.endSession();
-    console.log("End Session...");
+    console.log("Auth Service: Transaction committed successfully.");
 
     return { user };
   } catch (error) {
+    console.error("Auth Service Error during transaction:", error);
     await session.abortTransaction();
     session.endSession();
     throw error;
